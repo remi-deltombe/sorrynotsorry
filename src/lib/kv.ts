@@ -1,60 +1,54 @@
 import { GameState, GameRound, Player, SorryEvent } from "@/types/game";
 import { Redis } from "@upstash/redis";
-import { promises as fs } from "fs";
-import path from "path";
 
 const GAME_STATE_KEY = "sorry-game-state";
-const LOCAL_FILE_PATH = path.join(process.cwd(), ".game-state.json");
 
-// Check if Upstash Redis is available at runtime
-function isUpstashAvailable(): boolean {
-  return !!(
-    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-  );
+// Get Redis credentials - support multiple env var naming conventions
+function getRedisCredentials(): { url: string; token: string } | null {
+  const url = process.env.UPSTASH_REDIS_REST_URL || process.env.KV_REST_API_URL;
+  const token = process.env.UPSTASH_REDIS_REST_TOKEN || process.env.KV_REST_API_TOKEN;
+  
+  if (url && token) {
+    return { url, token };
+  }
+  return null;
 }
 
 // Create Redis client lazily
 let redisClient: Redis | null = null;
-function getRedisClient(): Redis {
+function getRedisClient(): Redis | null {
+  const credentials = getRedisCredentials();
+  if (!credentials) {
+    console.error("Redis credentials not found. Available env vars:", Object.keys(process.env).filter(k => k.includes('UPSTASH') || k.includes('KV') || k.includes('REDIS')));
+    return null;
+  }
+  
   if (!redisClient) {
     redisClient = new Redis({
-      url: process.env.UPSTASH_REDIS_REST_URL!,
-      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+      url: credentials.url,
+      token: credentials.token,
     });
   }
   return redisClient;
 }
 
-// Local file-based storage for development
-async function getLocalState(): Promise<GameState> {
-  try {
-    const data = await fs.readFile(LOCAL_FILE_PATH, "utf-8");
-    return JSON.parse(data);
-  } catch {
-    return { currentRound: null, history: [] };
-  }
-}
-
-async function saveLocalState(state: GameState): Promise<void> {
-  await fs.writeFile(LOCAL_FILE_PATH, JSON.stringify(state, null, 2));
-}
-
 export async function getGameState(): Promise<GameState> {
-  if (isUpstashAvailable()) {
-    const redis = getRedisClient();
-    const state = await redis.get<GameState>(GAME_STATE_KEY);
-    return state || { currentRound: null, history: [] };
+  const redis = getRedisClient();
+  if (!redis) {
+    throw new Error("Redis not configured. Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN environment variables.");
   }
-  return getLocalState();
+  
+  const state = await redis.get<GameState>(GAME_STATE_KEY);
+  return state || { currentRound: null, history: [] };
 }
 
 export async function saveGameState(state: GameState): Promise<void> {
-  if (isUpstashAvailable()) {
-    const redis = getRedisClient();
-    await redis.set(GAME_STATE_KEY, state);
-  } else {
-    await saveLocalState(state);
+  const redis = getRedisClient();
+  if (!redis) {
+    throw new Error("Redis not configured. Please set UPSTASH_REDIS_REST_URL and UPSTASH_REDIS_REST_TOKEN environment variables.");
   }
+  
+  await redis.set(GAME_STATE_KEY, state);
 }
 
 export async function startNewRound(
