@@ -1,14 +1,27 @@
 import { GameState, GameRound, Player, SorryEvent } from "@/types/game";
+import { Redis } from "@upstash/redis";
 import { promises as fs } from "fs";
 import path from "path";
 
 const GAME_STATE_KEY = "sorry-game-state";
 const LOCAL_FILE_PATH = path.join(process.cwd(), ".game-state.json");
 
-// Check if Vercel KV is available
-const useVercelKV = !!(
-  process.env.KV_REST_API_URL && process.env.KV_REST_API_TOKEN
+// Check if Upstash Redis is available
+const useUpstashRedis = !!(
+  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
 );
+
+// Create Redis client lazily
+let redisClient: Redis | null = null;
+function getRedisClient(): Redis {
+  if (!redisClient) {
+    redisClient = new Redis({
+      url: process.env.UPSTASH_REDIS_REST_URL!,
+      token: process.env.UPSTASH_REDIS_REST_TOKEN!,
+    });
+  }
+  return redisClient;
+}
 
 // Local file-based storage for development
 async function getLocalState(): Promise<GameState> {
@@ -25,18 +38,18 @@ async function saveLocalState(state: GameState): Promise<void> {
 }
 
 export async function getGameState(): Promise<GameState> {
-  if (useVercelKV) {
-    const { kv } = await import("@vercel/kv");
-    const state = await kv.get<GameState>(GAME_STATE_KEY);
+  if (useUpstashRedis) {
+    const redis = getRedisClient();
+    const state = await redis.get<GameState>(GAME_STATE_KEY);
     return state || { currentRound: null, history: [] };
   }
   return getLocalState();
 }
 
 export async function saveGameState(state: GameState): Promise<void> {
-  if (useVercelKV) {
-    const { kv } = await import("@vercel/kv");
-    await kv.set(GAME_STATE_KEY, state);
+  if (useUpstashRedis) {
+    const redis = getRedisClient();
+    await redis.set(GAME_STATE_KEY, state);
   } else {
     await saveLocalState(state);
   }
