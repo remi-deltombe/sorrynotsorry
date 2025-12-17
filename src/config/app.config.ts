@@ -6,10 +6,16 @@ export const config = {
   // Password from environment variable
   password: process.env.APP_PASSWORD || "",
 
-  // Player names
+  // Player configuration
   players: {
-    player1: "Katya",
-    player2: "Remi",
+    player1: {
+      name: "Katya",
+      picture: process.env.NEXT_PUBLIC_PLAYER1_PICTURE || "",
+    },
+    player2: {
+      name: "Remi",
+      picture: process.env.NEXT_PUBLIC_PLAYER2_PICTURE || "",
+    },
   },
 
   // Default sorry limit before losing

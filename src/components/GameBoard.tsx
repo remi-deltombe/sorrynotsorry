@@ -36,7 +36,8 @@ export function GameBoard({ round, onSorry, onShowHistory, loading }: GameBoardP
       {/* Player cards */}
       <div className="flex-1 grid grid-cols-1 gap-4 content-center">
         <PlayerCard
-          name={config.players.player1}
+          name={config.players.player1.name}
+          picture={config.players.player1.picture}
           count={round.player1Count}
           limit={round.sorryLimit}
           onClick={() => onSorry("player1")}
@@ -44,7 +45,8 @@ export function GameBoard({ round, onSorry, onShowHistory, loading }: GameBoardP
           color="pink"
         />
         <PlayerCard
-          name={config.players.player2}
+          name={config.players.player2.name}
+          picture={config.players.player2.picture}
           count={round.player2Count}
           limit={round.sorryLimit}
           onClick={() => onSorry("player2")}
@@ -70,8 +72,8 @@ export function GameBoard({ round, onSorry, onShowHistory, loading }: GameBoardP
                 >
                   <span className="text-neutral-600">
                     {event.player === "player1"
-                      ? config.players.player1
-                      : config.players.player2}{" "}
+                      ? config.players.player1.name
+                      : config.players.player2.name}{" "}
                     said sorry
                   </span>
                   <span className="text-neutral-400 text-xs">

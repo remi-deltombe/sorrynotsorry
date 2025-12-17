@@ -2,6 +2,7 @@
 
 interface PlayerCardProps {
   name: string;
+  picture?: string;
   count: number;
   limit: number;
   onClick: () => void;
@@ -11,6 +12,7 @@ interface PlayerCardProps {
 
 export function PlayerCard({
   name,
+  picture,
   count,
   limit,
   onClick,
@@ -40,11 +42,19 @@ export function PlayerCard({
       className={`${bgColor} rounded-2xl p-6 flex flex-col items-center gap-4 transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed w-full`}
     >
       {/* Avatar */}
-      <div
-        className={`w-24 h-24 rounded-full ${avatarBg} flex items-center justify-center text-3xl font-semibold`}
-      >
-        {initial}
-      </div>
+      {picture ? (
+        <img
+          src={picture}
+          alt={name}
+          className="w-24 h-24 rounded-full object-cover"
+        />
+      ) : (
+        <div
+          className={`w-24 h-24 rounded-full ${avatarBg} flex items-center justify-center text-3xl font-semibold`}
+        >
+          {initial}
+        </div>
+      )}
 
       {/* Name */}
       <span className="font-medium text-lg">{name}</span>

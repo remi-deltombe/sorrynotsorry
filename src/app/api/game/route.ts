@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { getGameState, startNewRound, addSorry, resetCurrentRound } from "@/lib/kv";
+import { getGameState, startNewRound, addSorry, resetCurrentRound, resetDatabase } from "@/lib/kv";
 import { Player } from "@/types/game";
 
 export async function GET() {
@@ -34,6 +34,11 @@ export async function POST(request: NextRequest) {
       case "reset": {
         await resetCurrentRound();
         return NextResponse.json({ success: true });
+      }
+
+      case "resetdb": {
+        await resetDatabase();
+        return NextResponse.json({ success: true, message: "Database reset" });
       }
 
       default:

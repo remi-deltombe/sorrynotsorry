@@ -134,3 +134,7 @@ export async function resetCurrentRound(): Promise<void> {
     await saveGameState(state);
   }
 }
+
+export async function resetDatabase(): Promise<void> {
+  await saveGameState({ currentRound: null, history: [] });
+}

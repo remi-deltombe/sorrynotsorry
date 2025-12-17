@@ -12,13 +12,13 @@ interface GameOverProps {
 export function GameOver({ round, onNewRound, onShowHistory }: GameOverProps) {
   const loserName =
     round.loser === "player1"
-      ? config.players.player1
-      : config.players.player2;
+      ? config.players.player1.name
+      : config.players.player2.name;
 
   const winnerName =
     round.loser === "player1"
-      ? config.players.player2
-      : config.players.player1;
+      ? config.players.player2.name
+      : config.players.player1.name;
 
   return (
     <div className="min-h-screen flex items-center justify-center p-4">
@@ -44,12 +44,12 @@ export function GameOver({ round, onNewRound, onShowHistory }: GameOverProps) {
         <div className="flex justify-center gap-8 mb-8">
           <div className="text-center">
             <p className="text-3xl font-bold">{round.player1Count}</p>
-            <p className="text-sm text-neutral-500">{config.players.player1}</p>
+            <p className="text-sm text-neutral-500">{config.players.player1.name}</p>
           </div>
           <div className="text-2xl text-neutral-300">vs</div>
           <div className="text-center">
             <p className="text-3xl font-bold">{round.player2Count}</p>
-            <p className="text-sm text-neutral-500">{config.players.player2}</p>
+            <p className="text-sm text-neutral-500">{config.players.player2.name}</p>
           </div>
         </div>
 

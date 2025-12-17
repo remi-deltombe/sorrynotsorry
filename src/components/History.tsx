@@ -48,12 +48,12 @@ export function History({ history, onBack }: HistoryProps) {
           {history.map((round) => {
             const loserName =
               round.loser === "player1"
-                ? config.players.player1
-                : config.players.player2;
+                ? config.players.player1.name
+                : config.players.player2.name;
             const winnerName =
               round.loser === "player1"
-                ? config.players.player2
-                : config.players.player1;
+                ? config.players.player2.name
+                : config.players.player1.name;
 
             return (
               <div
@@ -72,10 +72,10 @@ export function History({ history, onBack }: HistoryProps) {
                   </div>
                   <div className="flex gap-4 text-sm">
                     <span>
-                      {config.players.player1}: {round.player1Count}
+                      {config.players.player1.name}: {round.player1Count}
                     </span>
                     <span>
-                      {config.players.player2}: {round.player2Count}
+                      {config.players.player2.name}: {round.player2Count}
                     </span>
                   </div>
                 </div>
@@ -112,8 +112,8 @@ export function History({ history, onBack }: HistoryProps) {
                           </span>
                           <span className="flex-1">
                             {event.player === "player1"
-                              ? config.players.player1
-                              : config.players.player2}
+                              ? config.players.player1.name
+                              : config.players.player2.name}
                           </span>
                           <span className="text-neutral-400 text-xs">
                             {formatTime(event.timestamp)}
