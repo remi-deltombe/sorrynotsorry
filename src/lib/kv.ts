@@ -6,10 +6,12 @@ import path from "path";
 const GAME_STATE_KEY = "sorry-game-state";
 const LOCAL_FILE_PATH = path.join(process.cwd(), ".game-state.json");
 
-// Check if Upstash Redis is available
-const useUpstashRedis = !!(
-  process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
-);
+// Check if Upstash Redis is available at runtime
+function isUpstashAvailable(): boolean {
+  return !!(
+    process.env.UPSTASH_REDIS_REST_URL && process.env.UPSTASH_REDIS_REST_TOKEN
+  );
+}
 
 // Create Redis client lazily
 let redisClient: Redis | null = null;
@@ -38,7 +40,7 @@ async function saveLocalState(state: GameState): Promise<void> {
 }
 
 export async function getGameState(): Promise<GameState> {
-  if (useUpstashRedis) {
+  if (isUpstashAvailable()) {
     const redis = getRedisClient();
     const state = await redis.get<GameState>(GAME_STATE_KEY);
     return state || { currentRound: null, history: [] };
@@ -47,7 +49,7 @@ export async function getGameState(): Promise<GameState> {
 }
 
 export async function saveGameState(state: GameState): Promise<void> {
-  if (useUpstashRedis) {
+  if (isUpstashAvailable()) {
     const redis = getRedisClient();
     await redis.set(GAME_STATE_KEY, state);
   } else {
