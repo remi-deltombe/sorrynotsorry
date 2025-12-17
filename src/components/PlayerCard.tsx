@@ -53,7 +53,7 @@ export function PlayerCard({
       {picture && (
         <>
           <div
-            className="absolute inset-0 bg-cover bg-center blur-2xl scale-110"
+            className="absolute inset-0 bg-cover bg-center blur-[4px] scale-110"
             style={{ backgroundImage: `url(${picture})` }}
           />
           {/* Color overlay */}
