@@ -1,11 +1,10 @@
 /**
  * App Configuration
- * Change the password here to secure your app
  */
 
 export const config = {
-  // Change this password to whatever you want
-  password: "KatyaAndRemi2025",
+  // Password from environment variable
+  password: process.env.APP_PASSWORD || "",
 
   // Player names
   players: {
@@ -15,4 +14,4 @@ export const config = {
 
   // Default sorry limit before losing
   defaultSorryLimit: 15,
-} as const;
+};
